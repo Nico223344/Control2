@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Listado de personajes de Rick and Morty</title>
+  <style>
+    .card {
+      width: 300px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 10px;
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .card img {
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Listado de personajes de Rick and Morty</h1>
+
+  <form>
+    <label for="search">Buscar personaje:</label>
+    <input type="text" id="search" name="search">
+    <button type="submit">Buscar</button>
+  </form>
+
+  <div id="character-list"></div>
+
+  <script>
+    const characterList = document.getElementById('character-list');
+    const searchForm = document.querySelector('form');
+    const searchInput = document.getElementById('search');
+
+    searchForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      searchCharacters(searchInput.value);
+    });
+
+    function searchCharacters(query) {
+      characterList.innerHTML = 'Cargando...';
+
+      fetch(`https://rickandmortyapi.com/api/character/?name=${query}`)
+        .then((response) => response.json())
+        .then((data) => {
+          characterList.innerHTML = '';
+
+          if (data.results.length === 0) {
+            characterList.innerHTML = 'No se encontraron resultados.';
+          } else {
+            data.results.forEach((character) => {
+              const card = createCharacterCard(character);
+              characterList.appendChild(card);
+            });
+          }
+        })
+        .catch((error) => {
+          characterList.innerHTML = 'Ocurrió un error al cargar los datos.';
+          console.error(error);
+        });
+    }
+
+    function createCharacterCard(character) {
+      const card = document.createElement('div');
+      card.classList.add('card');
+
+      const image = document.createElement('img');
+      image.src = character.image;
+      image.alt = character.name;
+      card.appendChild(image);
+
+      const name = document.createElement('h2');
+      name.textContent = character.name;
+      card.appendChild(name);
+
+      const species = document.createElement('p');
+      species.textContent = `Species: ${character.species}`;
+      card.appendChild(species);
+
+      const status = document.createElement('p');
+      status.textContent = `Status: ${character.status}`;
+      card.appendChild(status);
+
+      return card;
+    }
+  </script>
+</body>
+</html>
